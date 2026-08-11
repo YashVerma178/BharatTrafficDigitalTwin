@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bharat Traffic AI — Digital Twin</title>
+<style>
+:root{
+ --bg:#eaf2fb;--surface:#fff;--surface-soft:#f4f8fd;--border:#cddced;
+ --text:#14243a;--muted:#657991;--blue:#145fd1;--blue2:#2f8fff;
+ --blue3:#74c4ff;--green:#16a873;--amber:#e8a12a;--red:#e95763;
+ --shadow:0 12px 30px rgba(42,75,115,.11);--radius:18px
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+background:radial-gradient(circle at 0 0,#d4e7fb 0,transparent 28%),linear-gradient(135deg,#edf4fc,#f7faff 60%,#e6f0fb);min-height:100vh}
+button,select{font:inherit}
+header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;
+background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);
+position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:13px;
+display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--blue3));box-shadow:0 8px 20px #145fd133;font-size:20px}
+.brand-title{font-size:18px;font-weight:850}.brand-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.live{display:flex;align-items:center;gap:8px;color:#16845f;font-size:12px;font-weight:800}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px #16a8731a}
+main{max-width:1500px;margin:auto;padding:28px}
+.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:20px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--blue);font-weight:850}
+h1{font-size:30px;line-height:1.1;margin:6px 0}.hero p{margin:0;color:var(--muted);font-size:13px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+select,button{border:1px solid var(--border);border-radius:11px;padding:11px 13px;background:#fff;color:var(--text);font-weight:750}
+button{cursor:pointer}.primary{border:0;color:#fff;background:linear-gradient(135deg,#145fd1,#2f8fff);box-shadow:0 8px 18px #145fd133}
+button:disabled{opacity:.55;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi,.card{background:rgba(255,255,255,.93);border:1px solid var(--border);box-shadow:var(--shadow)}
+.kpi{border-radius:16px;padding:17px;position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;right:-35px;top:-35px;width:95px;height:95px;border-radius:50%;background:#dcecff}
+.label{font-size:10px;color:var(--muted);font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.value{font-size:28px;font-weight:900;margin-top:7px;position:relative;z-index:1}.unit{font-size:11px;color:var(--muted)}
+.good{font-size:10px;color:var(--green);font-weight:750;margin-top:4px}
+.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(330px,.75fr);gap:16px}
+.card{border-radius:var(--radius);padding:18px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.title{font-size:15px;font-weight:850}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.badge{font-size:10px;font-weight:850;padding:6px 9px;border-radius:8px;color:var(--blue);background:#eaf4ff;border:1px solid #cfe3fa}
+.twin{height:500px;border-radius:16px;position:relative;overflow:hidden;border:1px solid #bfd1e5;
+background:linear-gradient(135deg,#edf4fb,#dfeaf5);box-shadow:inset 0 0 45px #7696b41a}
+.twin:before{content:"";position:absolute;left:35%;top:0;width:30%;height:100%;background:#566a80}
+.twin:after{content:"";position:absolute;left:0;top:35%;width:100%;height:30%;background:#566a80}
+.intersection{position:absolute;left:35%;top:35%;width:30%;height:30%;background:#65788c;z-index:2}
+.lane-v,.lane-h{position:absolute;z-index:3;opacity:.65}.lane-v{left:50%;top:0;height:100%;border-left:2px dashed #fff}.lane-h{top:50%;left:0;width:100%;border-top:2px dashed #fff}
+.sidewalk{position:absolute;background:#c9d5e1;z-index:1}.sw1{left:30%;top:0;width:5%;height:35%}.sw2{left:65%;top:0;width:5%;height:35%}.sw3{left:30%;bottom:0;width:5%;height:35%}.sw4{left:65%;bottom:0;width:5%;height:35%}
+.direction{position:absolute;z-index:6;color:#eef5fb;font-size:10px;font-weight:900;letter-spacing:.12em;text-shadow:0 1px 3px #24394e}
+.n{top:13px;left:50%;transform:translateX(-50%)}.s{bottom:13px;left:50%;transform:translateX(-50%)}.w{left:14px;top:50%;transform:translateY(-50%)}.e{right:14px;top:50%;transform:translateY(-50%)}
+.queue{position:absolute;z-index:9;background:#fff;border:1px solid #cbd9e8;border-radius:9px;padding:6px 9px;font-size:10px;font-weight:850;box-shadow:0 5px 14px #20385224}
+.qn{top:25%;left:50%;transform:translateX(-50%)}.qs{bottom:25%;left:50%;transform:translateX(-50%)}.qw{left:25%;top:50%;transform:translateY(-50%)}.qe{right:25%;top:50%;transform:translateY(-50%)}
+.signal{position:absolute;z-index:10;background:#172638;padding:5px;border:2px solid #fff;border-radius:8px;display:flex;gap:4px;box-shadow:0 5px 12px #17263844}.signal span{width:7px;height:7px;border-radius:50%;background:#596c80}.signal .red{background:var(--red)}.signal .green{background:var(--green);box-shadow:0 0 8px #16a87399}
+.sig-n{top:29%;left:31%}.sig-s{bottom:29%;right:31%}.sig-e{right:29%;top:31%}.sig-w{left:29%;bottom:31%}
+.vehicle{position:absolute;z-index:8;width:10px;height:18px;border-radius:4px;box-shadow:0 3px 7px #17263844}
+.car{background:#176fe0}.bike{width:6px;height:12px;background:#16a873}.auto{background:#e8a12a}.bus{width:12px;height:23px;background:#7658d9}.truck{width:13px;height:24px;background:#df6b4c}
+.legend{position:absolute;bottom:13px;left:13px;z-index:12;background:#ffffdd;border:1px solid #cbd9e8;border-radius:10px;padding:8px 10px;font-size:9px;background:#ffffffea;backdrop-filter:blur(8px)}
+.legend span{margin-right:8px}.legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px}
+.system-card{background:linear-gradient(145deg,#145fd1 0%,#2279df 48%,#48a8ff 100%);border-color:transparent;color:#fff;box-shadow:0 15px 34px #145fd13d}
+.system-card .sub,.system-card .row span,.system-card .ai-label{color:#dceeff}.system-card .badge{color:#fff;background:#ffffff1c;border-color:#ffffff33}
+.system-card .row{border-bottom-color:#ffffff24}.system-card .phase{background:#ffffff12;border-color:#ffffff24}.system-card .progress{background:#ffffff33}.system-card .progress i{background:#fff}.system-card .ai{background:#ffffff14;border:1px solid #ffffff24;box-shadow:none}
+.rows{display:grid}.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #e5edf5;font-size:12px}.row strong{font-weight:850}
+.phase{margin-top:15px;border:1px solid #dce8f5;border-radius:13px;padding:14px}.phase-top{display:flex;justify-content:space-between;font-size:10px;color:#dceeff;font-weight:800}.phase-name{font-size:15px;font-weight:900;margin-top:6px}.progress{height:7px;border-radius:10px;background:#ffffff33;margin-top:10px;overflow:hidden}.progress i{display:block;height:100%;width:60%;border-radius:10px}
+.ai{margin-top:14px;border-radius:13px;padding:14px}.ai-title{font-size:14px;font-weight:900}.ai-row{display:flex;justify-content:space-between;margin-top:9px;font-size:11px}.ai-row span{color:#dceeff}
+.bottom{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px}
+.chart{height:205px;border:1px solid #dfe8f2;border-radius:12px;background:linear-gradient(#fff,#f7faff);overflow:hidden}.chart canvas{width:100%;height:100%}
+.mix{display:grid;gap:13px}.mixrow{display:grid;grid-template-columns:105px 1fr 32px;gap:9px;align-items:center;font-size:11px}.bar{height:8px;border-radius:8px;background:#e2ebf5;overflow:hidden}.fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#145fd1,#49b2ff);transition:width .35s}
+.experiment{margin-top:16px}.status{font-size:11px;color:var(--muted)}table{width:100%;border-collapse:collapse;font-size:11px;margin-top:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid #e4ebf3}th{color:var(--muted)}
+.toast{position:fixed;right:22px;bottom:22px;z-index:100;background:#14243a;color:#fff;padding:12px 15px;border-radius:10px;box-shadow:var(--shadow);font-size:12px;display:none}.toast.show{display:block}
+@media(max-width:1050px){.layout,.bottom{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){main{padding:18px 14px}.kpis{grid-template-columns:1fr}.twin{height:390px}header{padding:0 15px}.brand-sub{display:none}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">🇮🇳</div><div><div class="brand-title">Bharat Traffic AI</div><div class="brand-sub">Digital Twin • Intelligent Signal Research</div></div></div>
+ <div class="live"><span class="dot"></span><span id="connection">Connecting…</span></div>
+</header>
+<main>
+<section class="hero">
+ <div><div class="eyebrow">AI Traffic Research Platform</div><h1>Traffic Control Command Center</h1><p>Simulate heterogeneous urban traffic, test signal controllers and measure congestion.</p></div>
+ <div class="controls">
+  <select id="controller"><option value="fixed">Fixed-Time</option><option value="actuated">Actuated</option><option value="ppo">PPO — AI Controller</option></select>
+  <select id="scenario"><option value="normal">Normal Traffic</option><option value="heterogeneous" selected>Heterogeneous Traffic</option><option value="heavy">Heavy Traffic</option><option value="bike_heavy">Bike Heavy</option><option value="auto_heavy">Auto Heavy</option><option value="blockage">Road Blockage</option><option value="monsoon">Monsoon</option><option value="sensor_failure">Sensor Failure</option><option value="sensor_spoofing">Sensor Spoofing</option></select>
+  <button id="startBtn" class="primary">▶ Start Simulation</button><button id="stopBtn">■ Stop</button>
+ </div>
+</section>
+<section class="kpis">
+ <div class="kpi"><div class="label">Average Queue</div><div class="value"><span id="queue">0.00</span> <span class="unit">vehicles</span></div><div class="good">Lower is better</div></div>
+ <div class="kpi"><div class="label">Waiting Time</div><div class="value"><span id="waiting">0.00</span> <span class="unit">sec</span></div><div class="good">Lower is better</div></div>
+ <div class="kpi"><div class="label">Average Speed</div><div class="value"><span id="speed">0.00</span> <span class="unit">m/s</span></div><div class="good">Higher is better</div></div>
+ <div class="kpi"><div class="label">Throughput</div><div class="value"><span id="throughput">0</span> <span class="unit">vehicles</span></div><div class="good">Higher is better</div></div>
+</section>
+
+<section class="layout">
+<div class="card">
+ <div class="head"><div><div class="title">Live Digital Twin</div><div class="sub">Four-way urban intersection • live simulation view</div></div><div class="badge" id="scenarioBadge">HETEROGENEOUS</div></div>
+ <div class="twin" id="twin">
+  <div class="sidewalk sw1"></div><div class="sidewalk sw2"></div><div class="sidewalk sw3"></div><div class="sidewalk sw4"></div><div class="intersection"></div><div class="lane-v"></div><div class="lane-h"></div>
+  <div class="direction n">NORTH</div><div class="direction s">SOUTH</div><div class="direction w">WEST</div><div class="direction e">EAST</div>
+  <div class="signal sig-n"><span class="red"></span><span></span><span></span></div><div class="signal sig-s"><span class="red"></span><span></span><span></span></div><div class="signal sig-e"><span class="red"></span><span></span><span></span></div><div class="signal sig-w"><span class="red"></span><span></span><span></span></div>
+  <div class="queue qn" id="northQueue">N 0.0</div><div class="queue qs" id="southQueue">S 0.0</div><div class="queue qw" id="westQueue">W 0.0</div><div class="queue qe" id="eastQueue">E 0.0</div>
+  <div id="vehicles"></div>
+  <div class="legend"><span><i style="background:#176fe0"></i>Car</span><span><i style="background:#16a873"></i>Bike</span><span><i style="background:#e8a12a"></i>Auto</span><span><i style="background:#7658d9"></i>Bus</span><span><i style="background:#df6b4c"></i>Truck</span></div>
+ </div>
+</div>
+
+<aside class="card system-card">
+ <div class="head"><div><div class="title">System State</div><div class="sub">Traffic-control and sensor state</div></div><div class="badge" id="sensorBadge">SENSOR OK</div></div>
+ <div class="rows">
+  <div class="row"><span>Controller</span><strong id="currentController">Fixed-Time</strong></div><div class="row"><span>Scenario</span><strong id="currentScenario">Heterogeneous Traffic</strong></div>
+  <div class="row"><span>Signal Phase</span><strong id="phase">NORTH / SOUTH</strong></div><div class="row"><span>Phase Remaining</span><strong><span id="remaining">30</span> sec</strong></div>
+  <div class="row"><span>Delay Proxy</span><strong id="delay">0.00</strong></div><div class="row"><span>Signal Switches</span><strong id="switches">0</strong></div><div class="row"><span>Stops</span><strong id="stops">0</strong></div>
+ </div>
+ <div class="phase"><div class="phase-top"><span>ACTIVE SIGNAL</span><span id="phaseTime">30s</span></div><div class="phase-name" id="phaseName">NORTH / SOUTH</div><div class="progress"><i id="phaseProgress"></i></div></div>
+ <div class="ai"><div class="ai-title">AI Controller</div><div class="sub">Reinforcement-learning decision layer</div>
+  <div class="ai-row"><span>Observation Space</span><strong>22 features</strong></div><div class="ai-row"><span>Action Space</span><strong>4 actions</strong></div><div class="ai-row"><span>Policy</span><strong id="policy">Fixed-Time</strong></div><div class="ai-row"><span>Status</span><strong id="aiStatus">Monitoring</strong></div>
+ </div>
+</aside>
+</section>
+
+<section class="bottom">
+ <div class="card"><div class="head"><div><div class="title">Queue Performance</div><div class="sub">Live average queue trend</div></div><div class="badge">LIVE</div></div><div class="chart"><canvas id="queueChart"></canvas></div></div>
+ <div class="card"><div class="head"><div><div class="title">Vehicle Composition</div><div class="sub">Heterogeneous traffic profile</div></div></div>
+  <div class="mix">
+   <div class="mixrow"><span>🚗 Cars</span><div class="bar"><div id="carBar" class="fill" style="width:0%"></div></div><strong id="carValue">0</strong></div>
+   <div class="mixrow"><span>🏍 Motorcycles</span><div class="bar"><div id="bikeBar" class="fill" style="width:0%"></div></div><strong id="bikeValue">0</strong></div>
+   <div class="mixrow"><span>🛺 Autos</span><div class="bar"><div id="autoBar" class="fill" style="width:0%"></div></div><strong id="autoValue">0</strong></div>
+   <div class="mixrow"><span>🚌 Buses</span><div class="bar"><div id="busBar" class="fill" style="width:0%"></div></div><strong id="busValue">0</strong></div>
+   <div class="mixrow"><span>🚚 Trucks</span><div class="bar"><div id="truckBar" class="fill" style="width:0%"></div></div><strong id="truckValue">0</strong></div>
+  </div>
+ </div>
+</section>
+
+<section class="card experiment">
+ <div class="head"><div><div class="title">Research Experiment</div><div class="sub">Compare controllers under the same traffic scenarios</div></div><button id="experimentBtn" class="primary">Run Experiment</button></div>
+ <div id="experimentStatus" class="status">Ready.</div><div id="resultsContainer"></div>
+ <div class="status" style="margin-top:12px">MVP measurements are simulation outputs and should be reported as simulation results in the paper.</div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const controllerNames={fixed:"Fixed-Time",actuated:"Actuated",ppo:"PPO — AI Controller"};
+const pretty=s=>String(s??"").replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
+let ws=null,history=[],retryTimer=null;
+
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove("show"),2800)}
+function apiUrl(path){return path}
+
+async function request(path,options={}){
+ const r=await fetch(apiUrl(path),options);
+ if(!r.ok){let msg="Request failed ("+r.status+")";try{const j=await r.json();msg=j.detail||j.message||msg}catch{}throw new Error(msg)}
+ const type=r.headers.get("content-type")||"";
+ return type.includes("application/json")?r.json():null;
+}
+
+async function startSimulation(){
+ $("startBtn").disabled=true;
+ try{
+  await request("/api/simulation/start",{method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({controller:$("controller").value,scenario:$("scenario").value,seed:42})});
+  toast("Simulation started");
+ }catch(e){toast("Could not start: "+e.message)}
+ finally{$("startBtn").disabled=false}
+}
+async function stopSimulation(){
+ try{await request("/api/simulation/stop",{method:"POST"});toast("Simulation stopped")}
+ catch(e){toast("Could not stop: "+e.message)}
+}
+
+function connect(){
+ if(ws&&ws.readyState<=1)return;
+ const protocol=location.protocol==="https:"?"wss:":"ws:";
+ ws=new WebSocket(protocol+"//"+location.host+"/ws/traffic");
+ ws.onopen=()=>{$("connection").textContent="System Live";if(retryTimer){clearTimeout(retryTimer);retryTimer=null}};
+ ws.onmessage=e=>{try{render(JSON.parse(e.data))}catch(err){console.warn("Invalid WebSocket payload",err)}};
+ ws.onerror=()=>ws.close();
+ ws.onclose=()=>{$("connection").textContent="Backend offline";retryTimer=setTimeout(connect,2000)};
+}
+function setText(id,value){const el=$(id);if(el)el.textContent=value}
+function render(s){
+ setText("queue",Number(s.average_queue??0).toFixed(2));setText("waiting",Number(s.average_waiting_time??0).toFixed(2));
+ setText("speed",Number(s.average_speed??0).toFixed(2));setText("throughput",s.throughput??0);
+ const ctl=controllerNames[s.controller]||pretty(s.controller||$("controller").value);
+ setText("currentController",ctl);setText("policy",ctl);setText("currentScenario",pretty(s.scenario||$("scenario").value));
+ setText("scenarioBadge",pretty(s.scenario||$("scenario").value).toUpperCase());
+ const ph=s.phase==="EAST_WEST"?"EAST / WEST":"NORTH / SOUTH";setText("phase",ph);setText("phaseName",ph);
+ const rem=Number(s.phase_remaining??30);setText("remaining",rem);setText("phaseTime",rem+"s");
+ setText("delay",Number(s.delay_proxy??0).toFixed(2));setText("switches",s.signal_switches??0);setText("stops",s.stops??0);
+ const sensor=String(s.sensor_status??"OK").toUpperCase();setText("sensorBadge","SENSOR "+sensor);setText("aiStatus",s.running?"Active":"Monitoring");
+ $("phaseProgress").style.width=Math.max(0,Math.min(100,rem/30*100))+"%";
+ const q=s.queues||{};setText("northQueue","N "+Number(q.north??0).toFixed(1));setText("southQueue","S "+Number(q.south??0).toFixed(1));setText("westQueue","W "+Number(q.west??0).toFixed(1));setText("eastQueue","E "+Number(q.east??0).toFixed(1));
+ updateMix(s.vehicle_counts||{});updateSignals(s.phase);updateVehicles(s.vehicle_counts||{});
+ history.push(Number(s.average_queue??0));if(history.length>80)history.shift();drawChart();
+}
+function updateMix(v){
+ const data=[["car",v.car,"carBar","carValue"],["motorcycle",v.motorcycle,"bikeBar","bikeValue"],["auto",v.auto,"autoBar","autoValue"],["bus",v.bus,"busBar","busValue"],["truck",v.truck,"truckBar","truckValue"]];
+ data.forEach(([k,val,bar,num])=>{val=Number(val??0);setText(num,val);$(bar).style.width=Math.min(100,val)+"%"});
+}
+function updateSignals(phase){
+ const ns=phase!=="EAST_WEST";document.querySelectorAll(".signal").forEach(s=>{s.querySelectorAll("span").forEach(x=>x.className="")});
+ [".sig-n",".sig-s"].forEach(sel=>$(sel.slice(1))?.querySelector("span:first-child").classList.toggle("red",!ns));
+ [".sig-e",".sig-w"].forEach(sel=>$(sel.slice(1))?.querySelector("span:first-child").classList.toggle("red",ns));
+ const active=ns?[".sig-n",".sig-s"]:[".sig-e",".sig-w"];active.forEach(sel=>{const el=document.querySelector(sel);el?.querySelector("span:first-child")?.classList.remove("red");el?.querySelector("span:last-child")?.classList.add("green")});
+}
+function updateVehicles(v){
+ const box=$("vehicles"),total=Math.min(28,Object.values(v).reduce((a,b)=>a+Number(b||0),0));
+ while(box.children.length<total){
+  const el=document.createElement("div"),types=["car","car","bike","auto","bus","truck"];el.className="vehicle "+types[Math.floor(Math.random()*types.length)];
+  const side=Math.floor(Math.random()*4);
+  if(side===0){el.style.left=(46+Math.random()*7)+"%";el.style.top=(6+Math.random()*26)+"%"}
+  if(side===1){el.style.left=(46+Math.random()*7)+"%";el.style.top=(68+Math.random()*26)+"%"}
+  if(side===2){el.style.left=(6+Math.random()*26)+"%";el.style.top=(46+Math.random()*7)+"%"}
+  if(side===3){el.style.left=(68+Math.random()*26)+"%";el.style.top=(46+Math.random()*7)+"%"}
+  box.appendChild(el);
+ }
+ while(box.children.length>total)box.lastChild.remove();
+}
+function drawChart(){
+ const c=$("queueChart"),r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;if(!r.width)return;
+ c.width=Math.floor(r.width*d);c.height=Math.floor(r.height*d);const ctx=c.getContext("2d");ctx.setTransform(d,0,0,d,0,0);
+ const w=r.width,h=r.height;ctx.clearRect(0,0,w,h);
+ ctx.strokeStyle="#e3ebf4";ctx.lineWidth=1;for(let i=1;i<5;i++){const y=i*h/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ if(history.length<2)return;const max=Math.max(5,...history);ctx.beginPath();
+ history.forEach((v,i)=>{const x=i/(history.length-1)*w,y=h-14-v/max*(h-28);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+ ctx.strokeStyle="#145fd1";ctx.lineWidth=2.5;ctx.stroke();
+}
+async function runExperiment(){
+ const btn=$("experimentBtn");btn.disabled=true;$("experimentStatus").textContent="Running controller comparison…";
+ try{
+  const d=await request("/api/experiments/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scenarios:["normal","heterogeneous","heavy"],episodes:2,steps:400})});
+  $("experimentStatus").textContent=`Experiment completed${d?.rows!=null?" — "+d.rows+" runs generated.":"."}`;await loadResults();
+ }catch(e){$("experimentStatus").textContent="Experiment could not be completed: "+e.message;toast("Experiment failed")}
+ finally{btn.disabled=false}
+}
+async function loadResults(){
+ try{
+  const rows=await request("/api/results");if(!Array.isArray(rows)||!rows.length)return;
+  let h="<table><thead><tr><th>Controller</th><th>Scenario</th><th>Queue ↓</th><th>Waiting ↓</th><th>Speed ↑</th><th>Throughput ↑</th></tr></thead><tbody>";
+  rows.slice(-20).forEach(a=>{h+=`<tr><td>${controllerNames[a.controller]||pretty(a.controller)}</td><td>${pretty(a.scenario)}</td><td>${Number(a.average_queue??0).toFixed(2)}</td><td>${Number(a.average_waiting_time??0).toFixed(2)}</td><td>${Number(a.average_speed??0).toFixed(2)}</td><td>${a.throughput??0}</td></tr>`});
+  $("resultsContainer").innerHTML=h+"</tbody></table>";
+ }catch(e){console.warn("Results unavailable:",e.message)}
+}
+$("startBtn").addEventListener("click",startSimulation);$("stopBtn").addEventListener("click",stopSimulation);$("experimentBtn").addEventListener("click",runExperiment);
+window.addEventListener("resize",drawChart);connect();loadResults();
+</script>
+</body>
+</html>

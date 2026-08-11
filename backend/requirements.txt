@@ -1,0 +1,10 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-dotenv>=1.0
+numpy>=1.26
+pandas>=2.2
+gymnasium>=0.29
+stable-baselines3>=2.3
+torch>=2.2
+traci>=1.20
